@@ -204,3 +204,4 @@ zipp==3.19.2
 chroma-hnswlib==0.7.6
 chromadb==0.5.5
 langchain-chroma==0.1.2
+langchain-google-genai==1.0.8
