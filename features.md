@@ -1,5 +1,6 @@
 # Features:
 
+- [] **Supported Documents**: Initially, this project is only supported PDF format. We will development to add more document format.
 - [] **Personal concept**
 - [] **User custom**: Allow users to choose their subject of focus for quiz generation..
   - Give user 2 options: _Generate based on full documents_ or _Specify a topic_.
@@ -18,3 +19,4 @@
 # Solutions:
 
 1. Load full text and embed all into context windows.
+2. Load each split documents to context windows and multi call LLM
