@@ -14,3 +14,7 @@
 
 **Large Context Windows**: Address the issue of handling full documents, which may involve large context windows.
 **Missing Content**: Ensure that no content is missing, especially from the middle sections of the documents.
+
+# Solutions:
+
+1. Load full text and embed all into context windows.
