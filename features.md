@@ -1,6 +1,7 @@
 # Features:
 
 - [] **Supported Documents**: Initially, this project is only supported PDF format. We will development to add more document format.
+- [] **Vector database**: Chroma
 - [] **Personal concept**
 - [] **User custom**: Allow users to choose their subject of focus for quiz generation..
   - Give user 2 options: _Generate based on full documents_ or _Specify a topic_.
