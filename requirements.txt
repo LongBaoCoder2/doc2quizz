@@ -201,3 +201,6 @@ wsproto==1.2.0
 xxhash==3.4.1
 yarl==1.9.4
 zipp==3.19.2
+chroma-hnswlib==0.7.6
+chromadb==0.5.5
+langchain-chroma==0.1.2
