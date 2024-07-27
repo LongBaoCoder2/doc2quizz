@@ -1,6 +1,8 @@
 # Features:
 
-- [] **Supported Documents**: Initially, this project is only supported PDF format. We will development to add more document format.
+- [x] **Supported Documents**: Initially, this project is only supported PDF format. We will development to add more document format.
+- [] Add reasoning for answers
+- [] Get relevant document.
 - [] **Vector database**: Chroma
 - [] **Personal concept**
 - [] **User custom**: Allow users to choose their subject of focus for quiz generation..
