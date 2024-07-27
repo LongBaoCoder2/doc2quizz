@@ -12,15 +12,8 @@ from langchain_google_genai import GoogleGenerativeAIEmbeddings, ChatGoogleGener
 
 from .prompt import template_system_prompt, template_user_document, template_output
 
-log_filename = 'logs/debug.log'
-logging.basicConfig(
-    level=logging.DEBUG,
-    format='%(asctime)s - %(levelname)s - %(message)s',
-    handlers=[
-        logging.FileHandler(log_filename),
-        logging.StreamHandler()  # Optionally log to the console as well
-    ]
-)
+
+logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
 
 # Define the Pydantic Quiz class
 class Quiz(BaseModel):
