@@ -2,7 +2,7 @@ import logging
 from typing import List
 from pydantic import BaseModel, ValidationError, TypeAdapter
 
-from prompt import template_system_prompt, template_user_document
+from prompt import template_system_prompt, template_user_document, template_output
 from langchain_community.document_loaders import PyMuPDFLoader
 from langchain_core.documents import Document
 from langchain_core.prompts import ChatPromptTemplate
@@ -11,13 +11,22 @@ from langchain_chroma import Chroma
 from langchain_google_genai import GoogleGenerativeAIEmbeddings, ChatGoogleGenerativeAI
 
 
-logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
+log_filename = 'logs/debug.log'
+logging.basicConfig(
+    level=logging.INFO,
+    format='%(asctime)s - %(levelname)s - %(message)s',
+    handlers=[
+        logging.FileHandler(log_filename),
+        logging.StreamHandler()  # Optionally log to the console as well
+    ]
+)
 
 # Define the Pydantic Quiz class
 class Quiz(BaseModel):
     question: str
     options: List[str]
     answer: str
+    reasoning: str
 
 quiz_ta = TypeAdapter(List[Quiz])
 
@@ -45,16 +54,16 @@ def parse_quizzes_from_response(response_content: str) -> List[Quiz]:
     quizzes = []
     # Assume each response contains quiz questions separated by new lines
     left = response_content.find("[")
-    right = response_content.find("]")
+    right = response_content.rfind("]")
 
     response_content = response_content[left: right + 1]
 
     try:
-        quiz_ta.validate_json(response_content)
+        list_quizzes = quiz_ta.validate_json(response_content)
     except ValidationError as e:
         logging.error(f"Validation error: {e}")
 
-    return 
+    return list_quizzes
 
 # Function to generate quizzes from full documents
 def generate_quizzes_from_full_documents(documents: List[Document]) -> List[Quiz]:
@@ -72,7 +81,7 @@ def generate_quizzes_from_full_documents(documents: List[Document]) -> List[Quiz
     quizzes = []
 
     for response in responses:
-        logging.info("Parse response: \n")
+        logging.info(f"Parse response: \n{response.content}")
         quizzes.extend(parse_quizzes_from_response(response.content))
         logging.info("Parse successfully: \n")
     
@@ -83,9 +92,16 @@ def generate_quizzes_from_full_documents(documents: List[Document]) -> List[Quiz
 def merge_quizzes(quizzes: List[Quiz]) -> str:
     logging.info("Merging quizzes into a single response")
 
-    merged_response = "\n\n".join([
-        f"Question {i + 1}: {quiz.question}\nOptions: {', '.join(quiz.options)}\nAnswer: {quiz.answer}" 
-            for i, quiz in enumerate(quizzes)
+    merged_response = "\n\n".join([template_output.format(
+                index=i, 
+                question=quiz.question,
+                option_a=quiz.options[0],
+                option_b=quiz.options[1],
+                option_c=quiz.options[2],
+                option_d=quiz.options[3],
+                answer=quiz.answer,
+                reasoning=quiz.reasoning
+            )  for i, quiz in enumerate(quizzes)
         ])
     return merged_response
 
