@@ -32,15 +32,12 @@ class QuizGenerator:
         ])
         self.quiz_ta = TypeAdapter(List[Quiz])
         self.text_splitter = RecursiveCharacterTextSplitter(**text_splitter_kwargs)
-        self.model = ChatGoogleGenerativeAI(api_key=api_key, 
-                                            model="gemini-pro", 
-                                            temperature=0,
-                                            **model_kwargs)
 
         self.loader_classes = {
             'pdf': PyMuPDFLoader,
             # 'other_loader': OtherLoaderClass
         }
+        self.model_kwargs = model_kwargs
 
 
     # Function to load and split the PDF document
@@ -97,6 +94,11 @@ class QuizGenerator:
 
         # Create a list of messages to send to the LLM model, where each message is a formatted prompt template
         messages = [self.prompt_template.format(document=document, number=2) for document in documents]
+        self.model = ChatGoogleGenerativeAI(api_key=api_key, 
+                                        model="gemini-pro", 
+                                        temperature=0,
+                                        **self.model_kwargs)
+
 
         # Send the messages to the LLM model in batches and retrieve the responses
         try:
