@@ -15,13 +15,13 @@ The output should be in the following JSON format:
 [
     {{
         "question": "[Write the question here]",
-        "options": ["A: [Option A]", "B: [Option B]", "C: [Option C]", "D: [Option D]"],
+        "options": ["[Option A]", "[Option B]", "[Option C]", "[Option D]"],
         "answer": "[Specify the correct option]",
         "reasoning": "[Provide reasoning here]"
     }},
     {{
         "question": "[Write the question here]",
-        "options": ["A: [Option A]", "B: [Option B]", "C: [Option C]", "D: [Option D]"],
+        "options": ["[Option A]", "[Option B]", "[Option C]", "[Option D]"],
         "answer": "[Specify the correct option]",
         "reasoning": "[Provide reasoning here]"
     }},
@@ -32,7 +32,7 @@ Example:
 [
     {{
         "question": "What is the capital of France?",
-        "options": ["A: Berlin", "B: Madrid", "C: Paris", "D: Rome"],
+        "options": ["Berlin", "Madrid", "Paris", "Rome"],
         "answer": "C",
         "reasoning": "Paris is the capital city of France, known for its cultural, political, and economic significance."
     }},
@@ -79,3 +79,13 @@ Example:
 """
 
 template_user_document = "Document: {document}"
+
+template_output = """
+Question {index}: {question}
+A: {option_a}
+B: {option_b}
+C: {option_c}
+D: {option_d}
+Answer: {answer}
+Reasoning: {reasoning}
+"""
