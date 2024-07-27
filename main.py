@@ -1,6 +1,8 @@
 import logging
-from typing import List
+from typing import List, TypedDict
 from pydantic import BaseModel, ValidationError, TypeAdapter
+from pathlib import Path
+
 
 from prompt import template_system_prompt, template_user_document, template_output
 from langchain_community.document_loaders import PyMuPDFLoader
@@ -28,67 +30,112 @@ class Quiz(BaseModel):
     answer: str
     reasoning: str
 
-quiz_ta = TypeAdapter(List[Quiz])
 
-# Define the prompt template
-prompt_template = ChatPromptTemplate.from_messages([
-    ("system", template_system_prompt),
-    ("user", template_user_document)
-])
+class QuizGenerator:
+    def __init__(self, text_splitter_kwargs: dict = {}):
+        # Define the prompt template
+        self.prompt_template = ChatPromptTemplate.from_messages([
+                ("system", template_system_prompt),
+                ("user", template_user_document)
+        ])
+        self.quiz_ta = TypeAdapter(List[Quiz])
+        self.text_splitter = RecursiveCharacterTextSplitter(**text_splitter_kwargs)
 
-# Function to load and split the PDF document
-def load_pdf(pdf_path: str) -> List[Document]:
-    logging.info(f"Loading PDF from path: {pdf_path}")
-    text_splitter = RecursiveCharacterTextSplitter(chunk_size=1000, chunk_overlap=0)
+        self.loader_classes = {
+            'pdf': PyMuPDFLoader,
+            # 'other_loader': OtherLoaderClass
+        }
 
-    # Initialize the PyMuPDF loader
-    loader = PyMuPDFLoader(file_path=pdf_path)
-    # Load the PDF file as a list of Document objects
-    documents = loader.load_and_split(text_splitter)
-    logging.info(f"Loaded {len(documents)} document chunks from PDF")
 
-    return documents
+    # Function to load and split the PDF document
+    def load_pdf(self, file_path: str, type_file: str = "pdf", **kwargs) -> List[Document]:
+        logging.info(f"Loading PDF from path: {pdf_path}")
 
-# Function to parse the LLM response into Quiz objects
-def parse_quizzes_from_response(response_content: str) -> List[Quiz]:
-    quizzes = []
-    # Assume each response contains quiz questions separated by new lines
-    left = response_content.find("[")
-    right = response_content.rfind("]")
+        document_loader = self.loader_classes[type_file](file_path=file_path)
+        if document_loader is None:
+            raise NotImplementedError(f"{self.loader_classes} is not supported yet.")
 
-    response_content = response_content[left: right + 1]
+        # Load the PDF file as a list of Document objects
+        documents = document_loader.load_and_split(self.text_splitter)
+        logging.info(f"Loaded {len(documents)} document chunks from PDF")
 
-    try:
-        list_quizzes = quiz_ta.validate_json(response_content)
-    except ValidationError as e:
-        logging.error(f"Validation error: {e}")
+        return documents
 
-    return list_quizzes
+    def parse_quizzes_from_response(self, response_content: str) -> List[Quiz]:
+        """
+        This function takes a string response from a LLM and 
+        parses it into a list of Quiz objects.
+        """
 
-# Function to generate quizzes from full documents
-def generate_quizzes_from_full_documents(documents: List[Document]) -> List[Quiz]:
-    logging.info("Generating quizzes from documents")
+        quizzes = []
 
-    llm = ChatGoogleGenerativeAI(model="gemini-pro", 
-                                 temperature=0)
-    messages = [prompt_template.format(document=document, number=2) for document in documents]
-    try:
-        responses = llm.batch(messages[:5])  # You can adjust the batch size as needed
-    except Exception as e:
-        logging.error(f"Error during LLM batch processing: {e}")
-        return []
-    # Parse each response into Quiz objects
-    quizzes = []
+        # Find the start and end indices of the quiz data in the response
+        # This is done by finding the first occurrence of '[' and the last occurrence of ']'
+        left = response_content.find("[")
+        right = response_content.rfind("]")
 
-    for response in responses:
-        logging.info(f"Parse response: \n{response.content}")
-        quizzes.extend(parse_quizzes_from_response(response.content))
-        logging.info("Parse successfully: \n")
-    
-    logging.info(f"Generated {len(quizzes)} quizzes")
-    return quizzes
+        # Extract the quiz data from the response using the found indices
+        response_content = response_content[left: right + 1]
 
-# Function to merge all quizzes into a single response
+        try:
+            # Attempt to validate the extracted quiz data as JSON
+            # This will raise a ValidationError if the data is invalid
+            list_quizzes = self.quiz_ta.validate_json(response_content)
+        except ValidationError as e:
+            # Log any validation errors that occur
+            logging.error(f"Validation error: {e}")
+
+        return list_quizzes
+
+    def generate_quizzes_from_full_documents(self, documents: List[Document]) -> List[Quiz]:
+        """
+        This function generates quizzes from full documents by using a Large Language Model (LLM) to generate quiz questions.
+        Args:
+            documents (List[Document]): A list of Document objects containing the text to generate quizzes from.
+
+        Returns:
+            List[Quiz]: A list of Quiz objects containing the generated quizzes.
+        """
+
+        logging.info("Generating quizzes from documents")
+
+        # Create a list of messages to send to the LLM model, where each message is a formatted prompt template
+        llm = ChatGoogleGenerativeAI(model="gemini-pro", temperature=0)
+        messages = [self.prompt_template.format(document=document, number=2) for document in documents]
+
+        # Send the messages to the LLM model in batches and retrieve the responses
+        try:
+            responses = llm.batch(messages[:5])  # You can adjust the batch size as needed
+        except Exception as e:
+            logging.error(f"Error during LLM batch processing: {e}")
+            return []
+
+        # Iterate over the responses from the LLM model
+        quizzes = []
+        for response in responses:
+            quizzes.extend(self.parse_quizzes_from_response(response.content))
+
+        logging.info(f"Generated {len(quizzes)} quizzes")
+        return quizzes
+
+
+    def generate(self, pdf_path: str | Path) -> List[Quiz]:
+        """
+        This function generates quizzes from a PDF file by loading the PDF, splitting it into documents, and then generating quizzes from the documents.
+
+        Args:
+            pdf_path (str | Path): The path to the PDF file to generate quizzes from.
+
+        Returns:
+            List[Quiz]: A list of Quiz objects containing the generated quizzes.
+        """
+
+        # Load the PDF file and split it into documents
+        documents = self.load_pdf(pdf_path)
+        quizzes = self.generate_quizzes_from_full_documents(documents)
+        return quizzes
+
+
 def merge_quizzes(quizzes: List[Quiz]) -> str:
     logging.info("Merging quizzes into a single response")
 
@@ -107,11 +154,11 @@ def merge_quizzes(quizzes: List[Quiz]) -> str:
 
 # Example usage
 if __name__ == "__main__":
-    pdf_path = 'data/Patch-level Routing in Mixture-of-Experts is Provably Sample-efficient for.pdf'
-    documents = load_pdf(pdf_path)
+    quiz_generator = QuizGenerator()
 
-    logging.info("Start generating quizzes:")
-    quizzes = generate_quizzes_from_full_documents(documents)
+    pdf_path = 'data/Patch-level Routing in Mixture-of-Experts is Provably Sample-efficient for.pdf'
+
+    quizzes = quiz_generator.generate(pdf_path)
     final_response = merge_quizzes(quizzes)
     
     logging.info("Final Merged Response:")
