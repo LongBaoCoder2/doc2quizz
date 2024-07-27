@@ -3,7 +3,6 @@ from typing import List, TypedDict, Literal
 from pydantic import BaseModel, ValidationError, TypeAdapter
 from pathlib import Path
 
-from prompt import template_system_prompt, template_user_document, template_output
 from langchain_community.document_loaders import PyMuPDFLoader
 from langchain_core.documents import Document
 from langchain_core.prompts import ChatPromptTemplate
@@ -11,6 +10,7 @@ from langchain_text_splitters import RecursiveCharacterTextSplitter
 from langchain_chroma import Chroma
 from langchain_google_genai import GoogleGenerativeAIEmbeddings, ChatGoogleGenerativeAI
 
+from .prompt import template_system_prompt, template_user_document, template_output
 
 log_filename = 'logs/debug.log'
 logging.basicConfig(
@@ -52,7 +52,7 @@ class QuizGenerator:
 
     # Function to load and split the PDF document
     def load_pdf(self, file_path: str, type_file: Literal["pdf"] = "pdf", **kwargs) -> List[Document]:
-        logging.info(f"Loading PDF from path: {pdf_path}")
+        logging.info(f"Loading PDF from path: {file_path}")
 
         document_loader = self.loader_classes[type_file](file_path=file_path)
         if document_loader is None:

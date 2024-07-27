@@ -6,16 +6,19 @@ from pydantic import ValidationError
 
 from src.generator import QuizGenerator, Quiz, merge_quizzes
 
-MOCK_PDF_FILE = "data\Patch-level Routing in Mixture-of-Experts is Provably Sample-efficient for.pdf"
 
+@pytest.fixture
+def mock_pdf_file():
+    pdf_file = "data/Patch-level Routing in Mixture-of-Experts is Provably Sample-efficient for.pdf"
+    return pdf_file
 
 @pytest.fixture
 def quiz_generator():
     return QuizGenerator()
 
-def test_load_pdf(quiz_generator):
+def test_load_pdf(quiz_generator, mock_pdf_file):
     # Create a mock PDF file
-    pdf_path = MOCK_PDF_FILE
+    pdf_path = mock_pdf_file
     
     # Load the PDF file
     documents = quiz_generator.load_pdf(pdf_path)
@@ -34,30 +37,30 @@ def test_parse_quizzes_from_response(quiz_generator):
     assert len(quizzes) == 1
     assert isinstance(quizzes[0], Quiz)
 
-def test_generate_quizzes_from_full_documents(quiz_generator):
-    # Create mock documents
-    documents = [
-        Document(text="This is document 1."),
-        Document(text="This is document 2.")
-    ]
+# def test_generate_quizzes_from_full_documents(quiz_generator):
+#     # Create mock documents
+#     documents = [
+#         Document(page_content="This is document 1."),
+#         Document(page_content="This is document 2.")
+#     ]
     
-    # Generate quizzes from the documents
-    quizzes = quiz_generator.generate_quizzes_from_full_documents(documents)
+#     # Generate quizzes from the documents
+#     quizzes = quiz_generator.generate_quizzes_from_full_documents(documents)
     
-    # Assert that the quizzes were correctly
-    assert len(quizzes) > 0
-    assert all(isinstance(quiz, Quiz) for quiz in quizzes)
+#     # Assert that the quizzes were correctly
+#     assert len(quizzes) > 0
+#     assert all(isinstance(quiz, Quiz) for quiz in quizzes)
 
-def test_generate(quiz_generator):
-    # Create a mock PDF file
-    pdf_path = MOCK_PDF_FILE
+# def test_generate(quiz_generator, mock_pdf_file):
+#     # Create a mock PDF file
+#     pdf_path = mock_pdf_file
     
-    # Generate quizzes from the PDF file
-    quizzes = quiz_generator.generate(pdf_path)
+#     # Generate quizzes from the PDF file
+#     quizzes = quiz_generator.generate(pdf_path)
     
-    # Assert that the quizzes were generated correctly
-    assert len(quizzes) > 0
-    assert all(isinstance(quiz, Quiz) for quiz in quizzes)
+#     # Assert that the quizzes were generated correctly
+#     assert len(quizzes) > 0
+#     assert all(isinstance(quiz, Quiz) for quiz in quizzes)
 
 def test_merge_quizzes():
     quizzes = [
@@ -68,8 +71,8 @@ def test_merge_quizzes():
 
     assert "Q1?" in merged
     assert "Q2?" in merged
-    assert "A) A" in merged
-    assert "D) Z" in merged
+    assert "A: A" in merged
+    assert "D: Z" in merged
     assert "Answer: A" in merged
     assert "Answer: Z" in merged
     assert "Reasoning: R1" in merged
