@@ -21,8 +21,9 @@ const FileUpload = (props : Props) => {
             "bg-secondary p-4 rounded-lg",
             "w-[18rem] border-2 border-dashed border-gray-400",
             props.className)}>
-            {file ? (<div className="w-full text-center overflow-hidden break-words">
-                        <p className="text-slate-50 ">{file.name}</p>
+            {file ? (<div className="flex justify-center items-center gap-6 w-full text-center overflow-hidden break-words">
+                        {/* <FileCheck /> */}
+                        <p className="text-slate-50">{file.name}</p>
                     </div>) 
 
                   : (<div>
