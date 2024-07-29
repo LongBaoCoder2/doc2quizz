@@ -3,99 +3,66 @@
 import { Button } from "@/components/ui/button";
 import { useState } from "react";
 import ProgressBar from '@/components/ProgressBar'
+import ResultBox from '@/components/ResultBox'
 import { ChevronLeft, X } from "lucide-react";
+import { Answer, Question } from "@/types/Question";
+import FileUpload from "@/components/FileUpload";
 
 
-type Answer = {
-    id: number,
-    answerContent: string,
-    isCorrect: boolean,
-}
 
-type Question = {
-    questionContent: string,
-    answers: Answer[]
-}
 
-const questions: Question[] = 
-[
+const questions: Question[] = [
     {
-        "questionContent": "What is the chemical symbol for gold?",
+        "questionContent": "What is the capital of France?",
         "answers": [
-            {
-                "id": 1,
-                "answerContent": "Au",
-                "isCorrect": true
-            },
-            {
-                "id": 2,
-                "answerContent": "Ag",
-                "isCorrect": false
-            },
-            {
-                "id": 3,
-                "answerContent": "Pb",
-                "isCorrect": false
-            },
-            {
-                "id": 4,
-                "answerContent": "Fe",
-                "isCorrect": false
-            }
-        ]
+            { "id": 1, "answerContent": "Paris", "isCorrect": true },
+            { "id": 2, "answerContent": "Lyon", "isCorrect": false },
+            { "id": 3, "answerContent": "Marseille", "isCorrect": false },
+            { "id": 4, "answerContent": "Nice", "isCorrect": false }
+        ],
+        "reasoning": "Paris is the capital and most populous city of France."
     },
     {
-        "questionContent": "Who wrote 'To Kill a Mockingbird'?",
+        "questionContent": "Which element has the chemical symbol 'O'?",
         "answers": [
-            {
-                "id": 1,
-                "answerContent": "Harper Lee",
-                "isCorrect": true
-            },
-            {
-                "id": 2,
-                "answerContent": "Mark Twain",
-                "isCorrect": false
-            },
-            {
-                "id": 3,
-                "answerContent": "Ernest Hemingway",
-                "isCorrect": false
-            },
-            {
-                "id": 4,
-                "answerContent": "J.D. Salinger",
-                "isCorrect": false
-            }
-        ]
+            { "id": 1, "answerContent": "Oxygen", "isCorrect": true },
+            { "id": 2, "answerContent": "Gold", "isCorrect": false },
+            { "id": 3, "answerContent": "Silver", "isCorrect": false },
+            { "id": 4, "answerContent": "Osmium", "isCorrect": false }
+        ],
+        "reasoning": "The chemical symbol 'O' stands for Oxygen, which is a key element in the periodic table."
     },
     {
-        "questionContent": "What is the capital city of Japan?",
+        "questionContent": "Who wrote 'Pride and Prejudice'?",
         "answers": [
-            {
-                "id": 1,
-                "answerContent": "Tokyo",
-                "isCorrect": true
-            },
-            {
-                "id": 2,
-                "answerContent": "Osaka",
-                "isCorrect": false
-            },
-            {
-                "id": 3,
-                "answerContent": "Kyoto",
-                "isCorrect": false
-            },
-            {
-                "id": 4,
-                "answerContent": "Hiroshima",
-                "isCorrect": false
-            }
-        ]
+            { "id": 1, "answerContent": "Jane Austen", "isCorrect": true },
+            { "id": 2, "answerContent": "Charlotte Brontë", "isCorrect": false },
+            { "id": 3, "answerContent": "Mary Shelley", "isCorrect": false },
+            { "id": 4, "answerContent": "Emily Brontë", "isCorrect": false }
+        ],
+        "reasoning": "'Pride and Prejudice' is a novel by Jane Austen, first published in 1813."
+    },
+    {
+        "questionContent": "What is the largest planet in our solar system?",
+        "answers": [
+            { "id": 1, "answerContent": "Jupiter", "isCorrect": true },
+            { "id": 2, "answerContent": "Saturn", "isCorrect": false },
+            { "id": 3, "answerContent": "Neptune", "isCorrect": false },
+            { "id": 4, "answerContent": "Earth", "isCorrect": false }
+        ],
+        "reasoning": "Jupiter is the largest planet in our solar system, with a diameter of about 142,984 km."
+    },
+    {
+        "questionContent": "In which year did the Titanic sink?",
+        "answers": [
+            { "id": 1, "answerContent": "1912", "isCorrect": true },
+            { "id": 2, "answerContent": "1905", "isCorrect": false },
+            { "id": 3, "answerContent": "1920", "isCorrect": false },
+            { "id": 4, "answerContent": "1918", "isCorrect": false }
+        ],
+        "reasoning": "The RMS Titanic sank on April 15, 1912, after hitting an iceberg during its maiden voyage."
     }
 ]
-
 
 
 export default function Quizz() {
@@ -104,6 +71,8 @@ export default function Quizz() {
     const [score, setScore] = useState<number | null>(null);
     const [isCorrect, setIsCorrect] = useState<boolean | null>(null);
     const [selectedAnswer, setSelectedAnswer] = useState<number | null>(null);
+
+    const [listQuestions, setListQuestion] = useState<Question[] | null>(null);
 
 
     const handleNextButton = () => {
@@ -121,7 +90,8 @@ export default function Quizz() {
     }
 
     const handleAnswer = (answer: Answer) => {
-        setSelectedAnswer(answer.id);
+        if (selectedAnswer === null)
+            setSelectedAnswer(answer.id);
         const currentCorrect = answer.isCorrect;
         
         if (currentCorrect) {
@@ -129,14 +99,21 @@ export default function Quizz() {
             setScore(nextScore);
             console.log(score);
         }
-        setIsCorrect(currentCorrect);
+
+        if (isCorrect === null)
+            setIsCorrect(currentCorrect);
+    }
+
+    const handlePrevAnswer = () => {
+        if (currentQuestion > 0)
+            setCurrentQuestion(currentQuestion - 1);
     }
 
     return (
         <div className="flex flex-col flex-1">
             <div className="position-sticky top-0 z-10 shadow-md py-4 w-full">
                 <header className="grid grid-cols-[auto,1fr,auto] grid-flow-col items-center justify-between gap-5 py-2">
-                    <Button size="icon" variant={'outline'}>
+                    <Button size="icon" variant={'outline'} onClick={handlePrevAnswer}>
                         <ChevronLeft />
                     </Button>
                     <ProgressBar value={100 * currentQuestion / questions.length} />
@@ -153,17 +130,23 @@ export default function Quizz() {
                             <div className="grid grid-cols-1 gap-6 mt-10">
                                 {
                                     questions[currentQuestion]?.answers.map(ans => {
-                                        return <Button key={ans.id} variant={'secondary'} onClick={() => handleAnswer(ans)}>{ans.answerContent}</Button>
+                                        return <Button key={ans.id} 
+                                                       variant={'secondary'} 
+                                                       onClick={() => handleAnswer(ans)}
+                                                       className={selectedAnswer && selectedAnswer == ans.id ? "bg-lime-500" : ""}>
+                                                             {ans.answerContent}
+                                               </Button>
                                     })
                                 }
                             </div>
                         </div>
                 }
             </main>
-            <footer className="footer flex flex-col items-center pb-9 px-6 py-5 relative mb-0">
-                <p>{isCorrect ? "Correct" : "Incorrect"}</p> 
+            <footer className="footer flex flex-col items-center pb-9 px-6 py-5 relative mb-0 gap-6">
+                <ResultBox result={isCorrect} message={questions[currentQuestion]?.reasoning}/>
                 <Button onClick={handleNextButton}>{started ? "Next" : "Start"}</Button>
             </footer>
+                
         </div>
     )
 }
