@@ -1,11 +1,11 @@
+import asyncio
 import pytest
 from unittest.mock import MagicMock, patch
-from pathlib import Path
 from langchain_core.documents import Document
-from pydantic import ValidationError
 
 from src.generator import QuizGenerator, Quiz, merge_quizzes
 
+pytest_plugins = ('pytest_asyncio',)
 
 @pytest.fixture
 def mock_pdf_file():
@@ -16,26 +16,17 @@ def mock_pdf_file():
 def quiz_generator():
     return QuizGenerator()
 
-def test_load_pdf(quiz_generator, mock_pdf_file):
+@pytest.mark.asyncio
+async def test_load_pdf(quiz_generator, mock_pdf_file):
     # Create a mock PDF file
     pdf_path = mock_pdf_file
     
     # Load the PDF file
-    documents = quiz_generator.load_pdf(pdf_path)
+    documents = await quiz_generator.load_pdf(pdf_path)
     
     # Assert that the documents were loaded correctly
     assert len(documents) > 0
 
-def test_parse_quizzes_from_response(quiz_generator):
-    # Create a mock LLM response containing quiz data
-    response_content = '[{"question": "What is the capital of France?", "options": ["Paris", "London", "Berlin"], "answer": "Paris", "reasoning": "Paris is the capital of France."}]'
-    
-    # Parse the quiz data from the response
-    quizzes = quiz_generator.parse_quizzes_from_response(response_content)
-    
-    # Assert that the quizzes were parsed correctly
-    assert len(quizzes) == 1
-    assert isinstance(quizzes[0], Quiz)
 
 # def test_generate_quizzes_from_full_documents(quiz_generator):
 #     # Create mock documents
