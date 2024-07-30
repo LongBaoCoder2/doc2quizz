@@ -9,59 +9,6 @@ import { Answer, Question, QuestionResponse } from "@/types/Question";
 import { cn } from "@/lib/utils";
 
 
-const questions: Question[] = [
-    {
-        "questionContent": "What is the capital of France?",
-        "answers": [
-            { "id": 1, "answerContent": "Paris", "isCorrect": true },
-            { "id": 2, "answerContent": "Lyon", "isCorrect": false },
-            { "id": 3, "answerContent": "Marseille", "isCorrect": false },
-            { "id": 4, "answerContent": "Nice", "isCorrect": false }
-        ],
-        "reasoning": "Paris is the capital and most populous city of France."
-    },
-    {
-        "questionContent": "Which element has the chemical symbol 'O'?",
-        "answers": [
-            { "id": 1, "answerContent": "Oxygen", "isCorrect": true },
-            { "id": 2, "answerContent": "Gold", "isCorrect": false },
-            { "id": 3, "answerContent": "Silver", "isCorrect": false },
-            { "id": 4, "answerContent": "Osmium", "isCorrect": false }
-        ],
-        "reasoning": "The chemical symbol 'O' stands for Oxygen, which is a key element in the periodic table."
-    },
-    {
-        "questionContent": "Who wrote 'Pride and Prejudice'?",
-        "answers": [
-            { "id": 1, "answerContent": "Jane Austen", "isCorrect": true },
-            { "id": 2, "answerContent": "Charlotte Brontë", "isCorrect": false },
-            { "id": 3, "answerContent": "Mary Shelley", "isCorrect": false },
-            { "id": 4, "answerContent": "Emily Brontë", "isCorrect": false }
-        ],
-        "reasoning": "'Pride and Prejudice' is a novel by Jane Austen, first published in 1813."
-    },
-    {
-        "questionContent": "What is the largest planet in our solar system?",
-        "answers": [
-            { "id": 1, "answerContent": "Jupiter", "isCorrect": true },
-            { "id": 2, "answerContent": "Saturn", "isCorrect": false },
-            { "id": 3, "answerContent": "Neptune", "isCorrect": false },
-            { "id": 4, "answerContent": "Earth", "isCorrect": false }
-        ],
-        "reasoning": "Jupiter is the largest planet in our solar system, with a diameter of about 142,984 km."
-    },
-    {
-        "questionContent": "In which year did the Titanic sink?",
-        "answers": [
-            { "id": 1, "answerContent": "1912", "isCorrect": true },
-            { "id": 2, "answerContent": "1905", "isCorrect": false },
-            { "id": 3, "answerContent": "1920", "isCorrect": false },
-            { "id": 4, "answerContent": "1918", "isCorrect": false }
-        ],
-        "reasoning": "The RMS Titanic sank on April 15, 1912, after hitting an iceberg during its maiden voyage."
-    }
-]
-
 
 export default function Quizz() {
     const [started, setStarted] = useState<boolean>(false);  
