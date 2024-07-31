@@ -2,8 +2,8 @@ import logging
 from typing import List
 from pydantic import BaseModel as PydanticBaseModel, TypeAdapter, ValidationError
 
-from parser.format.quiz import JSON_FORMAT
-from parser.format.utils import _escape_curly_braces
+from src.parser.format.quiz import JSON_FORMAT
+from src.parser.format.utils import _escape_curly_braces
 
 
 # Define the Pydantic Quiz class

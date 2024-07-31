@@ -6,7 +6,9 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 from typing import List
 from pydantic import BaseModel
-from generator import QuizGenerator, merge_quizzes, Quiz
+
+from src.generator import QuizGenerator, Quiz
+from src.config import QuizGeneratorConfig
 
 logging.basicConfig(level=logging.DEBUG, format='%(asctime)s - %(levelname)s - %(message)s')
 
@@ -70,7 +72,8 @@ async def upload_file(file: UploadFile | None = File(...)):
 
         # Generate quizzes from the uploaded PDF
         # Load the PDF file and split it into documents
-        quiz_generator = QuizGenerator()
+        # For demo, I apply default config for QuizGenerator here
+        quiz_generator = QuizGenerator(QuizGeneratorConfig())
         quizzes = await quiz_generator.generate(filepath)
 
         # Clean up: remove the uploaded file

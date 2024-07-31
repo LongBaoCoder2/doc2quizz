@@ -1,0 +1,1 @@
+from .quiz_generation import QuizGeneratorConfig

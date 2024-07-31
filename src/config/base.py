@@ -1,6 +1,6 @@
 from pydantic import BaseModel
 
-class BaseConfig(BaseModel):
+class LLMConfig(BaseModel):
     api_key: str | None = None
     model: str = "gemini-pro"
     model_kwargs: dict = {}
