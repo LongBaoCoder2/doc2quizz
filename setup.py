@@ -7,8 +7,8 @@ with open('requirements.txt') as f:
 setup(
     name="docs2quizz",
     version="0.1.0",
-    packages=find_packages(where='src'),
-    package_dir={'': 'src'},
+    packages=find_packages(where='.'),
+    package_dir={'': '.'},
     install_requires=requirements,
     python_requires='>=3.10',
 )
