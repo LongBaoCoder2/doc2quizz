@@ -1,5 +1,9 @@
 import pytest
 from src.parser import QuizParse, Quiz
+import warnings
+
+warnings.filterwarnings("ignore", category=DeprecationWarning)
+
 
 @pytest.fixture
 def quiz_parser():

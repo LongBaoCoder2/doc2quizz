@@ -1,3 +1,4 @@
+import warnings
 import asyncio
 import pytest
 from unittest.mock import MagicMock, patch
@@ -5,7 +6,9 @@ from langchain_core.documents import Document
 
 from src.generator import QuizGenerator, Quiz, merge_quizzes
 
+warnings.filterwarnings("ignore", category=DeprecationWarning)
 pytest_plugins = ('pytest_asyncio',)
+
 
 @pytest.fixture
 def mock_pdf_file():
