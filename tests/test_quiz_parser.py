@@ -1,6 +1,8 @@
 import pytest
-from src.parser import QuizParse, Quiz
 import warnings
+
+from src.parser import QuizParse, Quiz
+from src.config.quiz_generation import QuizGeneratorConfig
 
 warnings.filterwarnings("ignore", category=DeprecationWarning)
 

@@ -5,6 +5,7 @@ from unittest.mock import MagicMock, patch
 from langchain_core.documents import Document
 
 from src.generator import QuizGenerator, Quiz, merge_quizzes
+from src.config.quiz_generation import QuizGeneratorConfig
 
 warnings.filterwarnings("ignore", category=DeprecationWarning)
 pytest_plugins = ('pytest_asyncio',)
@@ -17,15 +18,15 @@ def mock_pdf_file():
 
 @pytest.fixture
 def quiz_generator():
-    return QuizGenerator()
+    return QuizGenerator(QuizGeneratorConfig())
 
 @pytest.mark.asyncio
-async def test_load_pdf(quiz_generator, mock_pdf_file):
+async def test_load_document(quiz_generator, mock_pdf_file):
     # Create a mock PDF file
     pdf_path = mock_pdf_file
     
     # Load the PDF file
-    documents = await quiz_generator.load_pdf(pdf_path)
+    documents = await quiz_generator.load_document(pdf_path)
     
     # Assert that the documents were loaded correctly
     assert len(documents) > 0
