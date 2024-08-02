@@ -6,5 +6,5 @@ from langchain_core.documents import Document
 
 class DocumentLoader(ABC):
     @abstractmethod
-    async def load(self, file_path: str) -> List[Document]:
+    async def aload(self, file_path: str) -> List[Document]:
         pass

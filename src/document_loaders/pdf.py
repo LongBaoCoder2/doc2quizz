@@ -10,7 +10,7 @@ class PDFLoader(DocumentLoader):
     def __init__(self, text_splitter):
         self.text_splitter = text_splitter
 
-    async def load(self, file_path: str) -> List[Document]:
+    async def aload(self, file_path: str) -> List[Document]:
         loader = PyMuPDFLoader(file_path=file_path)
         doc_iter = await loader.aload()
         return self.text_splitter.split_documents(doc_iter)
