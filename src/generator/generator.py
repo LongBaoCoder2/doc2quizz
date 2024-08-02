@@ -7,11 +7,12 @@ from langchain_core.prompts import ChatPromptTemplate
 from langchain_text_splitters import RecursiveCharacterTextSplitter
 from langchain_google_genai import ChatGoogleGenerativeAI
 
+from src.generator.corrective import Corrective
 from src.generator.prompt import template_system_prompt, template_user_document, template_output
 from src.parser import Quiz, QuizParse
 from src.config.quiz_generation import QuizGeneratorConfig
 from src.document_loaders.pdf import PDFLoader
-
+from src.models import get_llm_model
 
 DEFAULT_MODEL_NAME = "gemini-pro"
 
@@ -26,10 +27,7 @@ class QuizGenerator:
             'pdf': PDFLoader(self.text_splitter),
             # 'other_loader': OtherLoaderClass
         }
-        self.model = ChatGoogleGenerativeAI(api_key=config.api_key,
-                                            model=self.model_name,
-                                            temperature=0,
-                                            **config.model_kwargs)
+        self.model = get_llm_model("gemini")(config=config, model=self.model_name)
 
     async def load_document(self, file_path: str, file_type: Literal["pdf"] = "pdf") -> List[Document]:
         logging.info(f"Loading document from path: {file_path}")
@@ -38,7 +36,7 @@ class QuizGenerator:
         if loader is None:
             raise NotImplementedError(f"{file_type} is not supported yet.")
         
-        documents = await loader.load(file_path)
+        documents = await loader.aload(file_path)
         logging.info(f"Loaded {len(documents)} document chunks")
         return documents
 
@@ -64,7 +62,7 @@ class QuizGenerator:
         messages = [self.prompt_template.format(document=document, number=2) for document in documents]
         # Send the messages to the LLM model in batches and retrieve the responses
         try:
-            responses = await self.model.abatch(messages[:5])  # You can adjust the batch size as needed
+            responses = await self.model.a_batch(messages[:5])  # You can adjust the batch size as needed
         except Exception as e:
             logging.error(f"Error during LLM batch processing: {e}")
             return []
@@ -97,6 +95,15 @@ class QuizGenerator:
         quizzes = await self.generate_from_documents(documents)
 
         return quizzes
+    
+    async def generate_and_correct(self, pdf_path: str | Path) -> List[Quiz]:
+        documents = await self.load_document(pdf_path)
+        quizzes = await self.generate_from_documents(documents)
+        
+        corrective = Corrective(self.model.model, self, documents)
+        corrected_quizzes = await corrective.correct_quizzes(quizzes)
+        
+        return corrected_quizzes
 
 
 def merge_quizzes(quizzes: List[Quiz]) -> str:
@@ -117,14 +124,16 @@ def merge_quizzes(quizzes: List[Quiz]) -> str:
 
 # Example usage
 if __name__ == "__main__":
-    quiz_generator = QuizGenerator()
+    async def main():
+        quiz_generator = QuizGenerator(QuizGeneratorConfig())
+        pdf_path = 'data/Patch-level Routing in Mixture-of-Experts is Provably Sample-efficient for.pdf'
+        quizzes = await quiz_generator.generate_and_correct(pdf_path)
+        final_response = merge_quizzes(quizzes)
+        logging.info("Final Merged Response:")
+        print(final_response)
 
-    pdf_path = 'data/Patch-level Routing in Mixture-of-Experts is Provably Sample-efficient for.pdf'
+    import asyncio
+    asyncio.run(main())
 
-    quizzes = quiz_generator.generate(pdf_path)
-    final_response = merge_quizzes(quizzes)
     
-    logging.info("Final Merged Response:")
-    print(final_response)
-
     

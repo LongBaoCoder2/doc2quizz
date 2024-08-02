@@ -1,32 +1,7 @@
 from abc import ABC, abstractmethod
 from typing import Any, Optional, List
 
-
-class BaseModel(ABC):
-    def __init__(self, model_name: Optional[str] = None, *args, **kwargs):
-        self.model_name = model_name
-        self.model = self.load_model(*args, **kwargs)
-
-    @abstractmethod
-    def load_model(self, *args, **kwargs):
-        """Loads a model, that will be responsible for scoring.
-
-        Returns:
-            A model object
-        """
-        pass
-
-    def __call__(self, *args: Any, **kwargs: Any) -> Any:
-        return self._call(*args, **kwargs)
-
-    @abstractmethod
-    def _call(self, *args, **kwargs):
-        """Runs the model to score / ourput the model predictions.
-
-        Returns:
-            A score or a list of results.
-        """
-        pass
+from langchain_core.messages.base import BaseMessage
 
 
 class BaseLLM(ABC):
@@ -58,6 +33,15 @@ class BaseLLM(ABC):
 
         Returns:
             A string.
+        """
+        pass
+
+    @abstractmethod
+    async def a_batch(self, *args, **kwargs) -> List[BaseMessage]:
+        """Runs the model to output LLM responses.
+
+        Returns:
+            A list of strings.
         """
         pass
 

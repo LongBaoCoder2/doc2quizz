@@ -74,7 +74,7 @@ async def upload_file(file: UploadFile | None = File(...)):
         # Load the PDF file and split it into documents
         # For demo, I apply default config for QuizGenerator here
         quiz_generator = QuizGenerator(QuizGeneratorConfig())
-        quizzes = await quiz_generator.generate(filepath)
+        quizzes = await quiz_generator.generate_and_correct(filepath)
 
         # Clean up: remove the uploaded file
         os.remove(filepath)

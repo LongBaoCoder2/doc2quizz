@@ -18,6 +18,7 @@ The output should be in the following JSON format:
     },
     [More if needed]
 ]
+```
 
 Example:
 [
@@ -29,4 +30,34 @@ Example:
     },
     ...
 ]
+"""
+
+BULLET_FORMAT = """
+Format:
+1. Question: [Write the question here]
+   - A: [Option A]
+   - B: [Option B]
+   - C: [Option C]
+   - D: [Option D]
+   - Correct Answer: [Specify the correct option]
+   - Reasoning: [Provide reasoning here]
+
+2. Question: [Write the question here]
+   - A: [Option A]
+   - B: [Option B]
+   - C: [Option C]
+   - D: [Option D]
+   - Correct Answer: [Specify the correct option]
+   - Reasoning: [Provide reasoning here]
+
+[Repeat the format for the specified number of questions]
+
+Example:
+1. Question: What is the capital of France?
+   - A: Berlin
+   - B: Madrid
+   - C: Paris
+   - D: Rome
+   - Correct Answer: C
+   - Reasoning: Paris is the capital city of France, known for its cultural, political, and economic significance.
 """
