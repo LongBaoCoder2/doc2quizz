@@ -11,7 +11,7 @@ from dotenv import load_dotenv
 async def main():
     # Initialize LLM, embeddings, and vector store
     llm = ChatGroq(temperature=0)
-    embeddings = JinaEmbeddings(jina_api_key="jina_f2d64cca94d74d10b1e7c2a53b74e750HlCB7f2g4o0SxEiEeD_CLw95OkGv")
+    embeddings = JinaEmbeddings(jina_api_key="...")
     
     # Load and process the document
     pdf_path = 'data/Patch-level Routing in Mixture-of-Experts is Provably Sample-efficient for.pdf'
